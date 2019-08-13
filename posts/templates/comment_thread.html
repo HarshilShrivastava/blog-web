@@ -1,0 +1,63 @@
+{% extends "Base.html" %}    
+{% load urlify %}
+{% load crispy_forms_tags %}
+{% block head_title %} {{instance.title}} | {{block.super}}{% endblock head_title %}
+
+{% block content %}    
+{{object}}
+<div class="col-sm-6 col-sm-offset-3">
+    {% if instance.image %}
+    <img src="{{instance.image.url}}" class="img-responsive"/>
+    {% endif %}
+    <h1>{{ title }}<small> {{instance.publish }}</small></h1>
+    <p>Author: {{instance.user}}</p>
+    <div class="row">   
+    <p><div class="col-sm-12 ">
+      <div class=" post-detail-item">{{instance.get_markdown }}</div>
+    <hr/><br/>
+    <div>
+      <p class="lead">Comments</p>
+      <form method="POST" action=".">{% csrf_token %}
+      {{ comment_form|crispy }}
+      <input type="submit" value="post comment" class="btn btn-default">
+      </form>
+      <hr/>
+      {% for comment in comments %}
+      <blockquote class="blockquote">
+      <p>{{comment.content}}</p>        
+
+<footer>via {{comment.user}}| {{comment.timestamp|timesince}} ago | {% if comment.children.count > 0 %}{{comment.children.count}} Comment{% if comment.children.count > 1 %}s{% endif %}|{% endif %}<a class="comment-reply-btn"  href="#"> Reply</a></footer>
+<div class="comment-reply" style="display: none">
+
+
+
+{% for child_comment in  comment.children %}
+<blockquote class="blockquote">
+  <p>{{child_comment.content}}</p>        
+<footer>via {{child_comment.user}}| {{child_comment.timestamp}}</footer>
+</blockquote>
+{% endfor %}
+<form method="POST" action=".">{% csrf_token %}
+  {{ comment_form|crispy }}
+  <input type="hidden" name="parent_id" value="{{comment.id}}">
+  <input type="submit" value=" reply" class="btn btn-default">
+  </form>
+</div>
+      </blockquote>
+<hr>
+      {% endfor %}
+    </div>
+</div>
+
+</p>
+</div>
+</div>
+
+
+    {% endblock content %}    
+   
+
+
+
+</body>    
+</html>

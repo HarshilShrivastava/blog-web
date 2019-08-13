@@ -1,0 +1,97 @@
+{% load staticfiles %}
+<html>
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-1.12.4.min.js"
+      integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <!-- Optional theme -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous"
+    />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+      integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $(".content-markdown").each(function() {
+          var content = $(this).text();
+          console.log(content);
+          var markedcontent = marked(content);
+          console.log(markedcontent);
+          $(this).html(markedcontent);
+        });
+        $(".post-detail-item img").each(function() {
+          $(this).addClass("img-responsive");
+        });
+        var titleItem = $("#id_title");
+        $("#preview-title").val(titleItem.val());
+
+        var contentInput = $("#id_content");
+        function sercontent(value) {
+          var markedcontent = marked(value);
+          $("#preview-content").html(markedcontent);
+          $("#preview-content img").each(function() {
+            $(this).addClass("img-responsive");
+          });
+        }
+        sercontent(contentInput.val());
+        contentInput.keyup(function() {
+          var newcontent = $(this).val();
+          sercontent(newcontent);
+        });
+        $(".comment-reply-btn").click(function(event) {
+          event.preventDefault();
+          $(this)
+            .parent()
+            .next(".comment-reply")
+            .fadeToggle();
+        });
+      });
+    </script>
+    <title>{% block head_title %} try blog{% endblock head_title %}</title>
+    <link rel="stylesheet" href='{% static "css/base.css" %}' />
+  </head>
+  <style>
+    {% block styl %} {% endblock styl %}
+  </style>
+  {% block head_extra %} {% endblock head_extra %}
+
+  <body>
+    <div id="fb-root"></div>
+    {% include "messages_display.html" %}
+    <div class="container">
+      <div class="breadcrumb">
+        <li><a href='{% url "posts:list" %}'>Home</a></li>
+        <li><a href='{% url "posts:list" %}'>posts</a></li>
+        {% if not request.user.is_authenticated %}
+        <li class="pull-right"><a href='{% url "register" %}'>Register</a></li>
+        <li class="pull-right"><a href='{% url "login" %}'>Login</a></li>
+        {% else %}
+
+        <li class="pull-right"><a href='{% url "logout" %}'>Logout</a></li>
+        {% endif %}
+      </div>
+      {% block content %} {% endblock content %}
+    </div>
+  </body>
+</html>
